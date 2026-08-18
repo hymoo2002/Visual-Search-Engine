@@ -20,6 +20,13 @@ from model_utils import embed_pil_image, get_device, load_model
 
 HERE = Path(__file__).resolve().parent
 DATA_DIR = HERE / "data"
+REPO_ROOT = HERE.parent  # image paths in metadata are stored relative to here
+
+
+def resolve_image_path(path_str: str) -> Path:
+    """Resolve a metadata path (repo-relative) to an absolute path on this host."""
+    p = Path(path_str)
+    return p if p.is_absolute() else (REPO_ROOT / p)
 
 st.set_page_config(page_title="Jewelry Visual Search", page_icon="💎", layout="wide")
 
@@ -34,6 +41,15 @@ def load_engine():
     """
     device = get_device()
     model = load_model(device)
+
+    # Self-heal: if the prebuilt index was not shipped with the repo (e.g. a
+    # fresh deploy), build it now from the committed catalog images. Normally
+    # the index is committed and this branch is skipped.
+    if not (DATA_DIR / "index.faiss").exists():
+        from prepare_data import build_index, default_data_dir
+
+        build_index(default_data_dir(), DATA_DIR, model=model, device=device, verbose=False)
+
     index = faiss.read_index(str(DATA_DIR / "index.faiss"))
     metadata = json.loads((DATA_DIR / "metadata.json").read_text(encoding="utf-8"))
     return model, index, metadata, device
@@ -73,7 +89,7 @@ def render_results(results: list[dict], threshold: float, columns: int = 5) -> N
         cols = st.columns(columns)
         for col, item in zip(cols, kept[row_start : row_start + columns]):
             with col:
-                img_path = Path(item["path"])
+                img_path = resolve_image_path(item["path"])
                 if img_path.exists():
                     st.image(str(img_path), use_container_width=True)
                 else:
@@ -89,14 +105,15 @@ def main() -> None:
         "**MobileNetV2** and search runs on a **FAISS** cosine-similarity index."
     )
 
-    if not (DATA_DIR / "index.faiss").exists():
+    try:
+        model, index, metadata, device = load_engine()
+    except FileNotFoundError as exc:
         st.error(
-            "No search index found. Run the offline pipeline first:\n\n"
-            "```\npython prepare_data.py\n```"
+            f"Could not load or build the search index: {exc}\n\n"
+            "Make sure the catalog images are present, then run "
+            "`python prepare_data.py` to build the index."
         )
         st.stop()
-
-    model, index, metadata, device = load_engine()
 
     # ---- Sidebar controls -------------------------------------------------
     with st.sidebar:

@@ -4,8 +4,6 @@ __pycache__/
 .venv/
 venv/
 
-# Generated artifacts (regenerate with `python prepare_data.py`)
-data/embeddings.npy
-data/index.faiss
-data/metadata.json
-data/config.json
+# NOTE: data/ (index.faiss, metadata.json, embeddings.npy, config.json) is
+# intentionally committed so the deployed app has a prebuilt index to load.
+# Regenerate it locally with: python prepare_data.py

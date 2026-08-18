@@ -1,0 +1,12 @@
+{
+  "model": "mobilenet_v2",
+  "weights": "IMAGENET1K_V1",
+  "embedding_dim": 1280,
+  "metric": "cosine (inner product on L2-normalized vectors)",
+  "num_images": 490,
+  "classes": {
+    "necklace": 301,
+    "ring": 189
+  },
+  "data_dir": "archive/Jewellery_Data"
+}
