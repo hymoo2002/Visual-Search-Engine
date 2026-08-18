@@ -1,0 +1,9 @@
+# Visual Search Engine — dependencies
+# Install torch/torchvision CPU builds from the PyTorch index if needed:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+faiss-cpu
+streamlit
+numpy
+pillow

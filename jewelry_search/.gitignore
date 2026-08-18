@@ -1,0 +1,11 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Generated artifacts (regenerate with `python prepare_data.py`)
+data/embeddings.npy
+data/index.faiss
+data/metadata.json
+data/config.json
