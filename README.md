@@ -4,6 +4,9 @@ An end-to-end **visual similarity search** tool built on the Tanishq Jewellery
 dataset. Upload (or snap) a photo of a piece of jewelry and the app returns the
 most visually similar items from the catalog.
 
+## The deployed page:
+https://visual-search-engine-jewels.streamlit.app/
+
 The pipeline uses **transfer learning** (MobileNetV2 pretrained on ImageNet, with
 its classification head removed) to turn each image into a 1280-dimensional
 embedding, then **FAISS** for fast cosine-similarity search, all wrapped in a
